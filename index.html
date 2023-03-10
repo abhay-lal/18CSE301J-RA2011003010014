@@ -62,263 +62,150 @@
             type='text/javascript'>                    var divElement = document.getElementById('viz1678003044955'); var vizElement = divElement.getElementsByTagName('object')[0]; vizElement.style.width = '1000px'; vizElement.style.height = '827px'; var scriptElement = document.createElement('script'); scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js'; vizElement.parentNode.insertBefore(scriptElement, vizElement);                </script>
       </div>
     </div>
+
     <meta charset="utf-8">
-    <h4 class="fs-3"><br>Assignment 3</h4> 
+    <h4 class="fs-3"><br>Assignment 3</h4>
     <h5>Using D3 JS created plots</h5>
     <!-- Load d3.js -->
     <script src="https://d3js.org/d3.v4.js"></script>
-    
+
     <!-- Create a div where the graph will take place -->
     <div id="my_dataviz"></div>
-    
+
     <!-- Style -->
     <style>
-    .xAxis line {
-      stroke: #181717;
-    }
+      .xAxis line {
+        stroke: #181717;
+      }
     </style>
-    
+
     <!-- Viridis color palette-->
     <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 
     <div class="row">
       <div class="col-12 text-center mt-5">
-          <script>
+        <script>
 
-            // set the dimensions and margins of the graph
-            var margin = {top: 90, right: 30, bottom: 50, left:110},
-                width = 700 - margin.left - margin.right,
-                height = 600 - margin.top - margin.bottom;
-            
-            // append the svg object to the body of the page
-            var svg = d3.select("#my_dataviz")
-              .append("svg")
-                .attr("width", width + margin.left + margin.right)
-                .attr("height", height + margin.top + margin.bottom)
-              .append("g")
-                .attr("transform",
-                      "translate(" + margin.left + "," + margin.top + ")");
-            
-            //read data
-            d3.csv("https://raw.githubusercontent.com/abhay-lal/18CSE301J-RA2011003010014/master/cybcrimetype.csv", function(data) {
-            
-              // Get the different categories and count them
-              // Add these in var categories Personal Revenge	Anger	Fraud	Extortion	Causing Disrepute	Prank	Sexual Exploitation	Political Motives	Terrorist Activities	Developing own business	Spreading Piracy	Steal Information	Abetment to Suicide	Others
+          // set the dimensions and margins of the graph
+          var margin = { top: 90, right: 30, bottom: 50, left: 110 },
+            width = 700 - margin.left - margin.right,
+            height = 600 - margin.top - margin.bottom;
 
-              
-              var categories = ["Personal", "Revenge",	"Anger","Fraud","Extortion","Causing Disrepute","Prank","Sexual Exploitation","Political Motives",	"Terrorist Activities","Developing own business","Spreading Piracy","	Steal Information","Abetment to Suicide","Others"]
-            
-              var n = categories.length
-            
-              // Compute the mean of each group
-              allMeans = []
-              for (i in categories){
-                currentGroup = categories[i]
-                mean = d3.mean(data, function(d) { return +d[currentGroup] })
-                allMeans.push(mean)
-              }
-            
-              // Create a color scale using these means.
-              var myColor = d3.scaleSequential()
-                .domain([0,100])
-                .interpolator(d3.interpolateViridis);
-            
-              // Add X axis
-              var x = d3.scaleLinear()
-                .domain([-10, 55])
-                .range([ 0, width ]);
-              svg.append("g")
-                .attr("class", "xAxis")
-                .attr("transform", "translate(0," + height + ")")
-                .call(d3.axisBottom(x).tickValues([0,25,50, 75,100]).tickSize(-height) )
-                .select(".domain").remove()
-            
-              // Add X axis label:
-              svg.append("text")
-                  .attr("text-anchor", "end")
-                  .attr("x", width)
-                  .attr("y", height + 40)
-                  .text("Crime Percentage");
-            
-              // Create a Y scale for densities
-              var y = d3.scaleLinear()
-                .domain([0, 0.55])
-                .range([ height, 0]);
-            
-              // Create the Y axis for names
-              var yName = d3.scaleBand()
-                .domain(categories)
-                .range([0, height])
-                .paddingInner(1)
-              svg.append("g")
-                .call(d3.axisLeft(yName).tickSize(0))
-                .select(".domain").remove()
-            
-              // Compute kernel density estimation for each column:
-              var kde = kernelDensityEstimator(kernelEpanechnikov(7), x.ticks(40)) // increase this 40 for more accurate density.
-              var allDensity = []
-              for (i = 0; i < n; i++) {
-                  key = categories[i]
-                  density = kde( data.map(function(d){  return d[key]; }) )
-                  allDensity.push({key: key, density: density})
-              }
-            
-              // Add areas
-              svg.selectAll("areas")
-                .data(allDensity)
-                .enter()
-                .append("path")
-                  .attr("transform", function(d){return("translate(0," + (yName(d.key)-height) +")" )})
-                  .attr("fill", function(d){
-                    grp = d.key ;
-                    index = categories.indexOf(grp)
-                    value = allMeans[index]
-                    return myColor( value  )
-                  })
-                  .datum(function(d){return(d.density)})
-                  .attr("opacity", 0.75)
-                  .attr("stroke", "#000")
-                  .attr("stroke-width", 0.1)
-                  .attr("d",  d3.line()
-                      .curve(d3.curveBasis)
-                      .x(function(d) { return x(d[0]); })
-                      .y(function(d) { return y(d[1]); })
-                  )
-            
-            })
-            
-            // This is what I need to compute kernel density estimation
-            function kernelDensityEstimator(kernel, X) {
-              return function(V) {
-                return X.map(function(x) {
-                  return [x, d3.mean(V, function(v) { return kernel(x - v); })];
-                });
-              };
+          // append the svg object to the body of the page
+          var svg = d3.select("#my_dataviz")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform",
+              "translate(" + margin.left + "," + margin.top + ")");
+
+          //read data
+          d3.csv("https://raw.githubusercontent.com/abhay-lal/18CSE301J-RA2011003010014/master/cybcrimetype.csv", function (data) {
+
+            // Get the different categories and count them
+            // Add these in var categories Personal Revenge	Anger	Fraud	Extortion	Causing Disrepute	Prank	Sexual Exploitation	Political Motives	Terrorist Activities	Developing own business	Spreading Piracy	Steal Information	Abetment to Suicide	Others
+
+
+            var categories = ["Personal", "Revenge", "Anger", "Fraud", "Extortion", "Causing Disrepute", "Prank", "Sexual Exploitation", "Political Motives", "Terrorist Activities", "Developing own business", "Spreading Piracy", "	Steal Information", "Abetment to Suicide", "Others"]
+
+            var n = categories.length
+
+            // Compute the mean of each group
+            allMeans = []
+            for (i in categories) {
+              currentGroup = categories[i]
+              mean = d3.mean(data, function (d) { return +d[currentGroup] })
+              allMeans.push(mean)
             }
-            function kernelEpanechnikov(k) {
-              return function(v) {
-                return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
-              };
-            }
-            
-            </script>
 
+            // Create a color scale using these means.
+            var myColor = d3.scaleSequential()
+              .domain([0, 100])
+              .interpolator(d3.interpolateViridis);
+
+            // Add X axis
+            var x = d3.scaleLinear()
+              .domain([-10, 55])
+              .range([0, width]);
+            svg.append("g")
+              .attr("class", "xAxis")
+              .attr("transform", "translate(0," + height + ")")
+              .call(d3.axisBottom(x).tickValues([0, 25, 50, 75, 100]).tickSize(-height))
+              .select(".domain").remove()
+
+            // Add X axis label:
+            svg.append("text")
+              .attr("text-anchor", "end")
+              .attr("x", width)
+              .attr("y", height + 40)
+              .text("Crime Percentage");
+
+            // Create a Y scale for densities
+            var y = d3.scaleLinear()
+              .domain([0, 0.55])
+              .range([height, 0]);
+
+            // Create the Y axis for names
+            var yName = d3.scaleBand()
+              .domain(categories)
+              .range([0, height])
+              .paddingInner(1)
+            svg.append("g")
+              .call(d3.axisLeft(yName).tickSize(0))
+              .select(".domain").remove()
+
+            // Compute kernel density estimation for each column:
+            var kde = kernelDensityEstimator(kernelEpanechnikov(7), x.ticks(40)) // increase this 40 for more accurate density.
+            var allDensity = []
+            for (i = 0; i < n; i++) {
+              key = categories[i]
+              density = kde(data.map(function (d) { return d[key]; }))
+              allDensity.push({ key: key, density: density })
+            }
+
+            // Add areas
+            svg.selectAll("areas")
+              .data(allDensity)
+              .enter()
+              .append("path")
+              .attr("transform", function (d) { return ("translate(0," + (yName(d.key) - height) + ")") })
+              .attr("fill", function (d) {
+                grp = d.key;
+                index = categories.indexOf(grp)
+                value = allMeans[index]
+                return myColor(value)
+              })
+              .datum(function (d) { return (d.density) })
+              .attr("opacity", 0.75)
+              .attr("stroke", "#000")
+              .attr("stroke-width", 0.1)
+              .attr("d", d3.line()
+                .curve(d3.curveBasis)
+                .x(function (d) { return x(d[0]); })
+                .y(function (d) { return y(d[1]); })
+              )
+
+          })
+
+          // This is what I need to compute kernel density estimation
+          function kernelDensityEstimator(kernel, X) {
+            return function (V) {
+              return X.map(function (x) {
+                return [x, d3.mean(V, function (v) { return kernel(x - v); })];
+              });
+            };
+          }
+          function kernelEpanechnikov(k) {
+            return function (v) {
+              return Math.abs(v /= k) <= 1 ? 0.75 * (1 - v * v) / k : 0;
+            };
+          }
+
+        </script>
       </div>
     </div>
-
-    <meta charset="utf-8">
-
-    <!-- Load d3.js and plugin for color scale -->
-    <script src="https://d3js.org/d3.v4.js"></script>
-    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
     
-    <!-- Create a div where the graph will take place -->
-    <div id="my_dataviz"></div>
-
-    <script>
-
-      // set the dimensions and margins of the graph
-      var margin = {top: 10, right: 30, bottom: 30, left: 40},
-          width = 460 - margin.left - margin.right,
-          height = 400 - margin.top - margin.bottom;
-      
-      // append the svg object to the body of the page
-      var svg = d3.select("#my_dataviz")
-        .append("svg")
-          .attr("width", width + margin.left + margin.right)
-          .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-          .attr("transform",
-                "translate(" + margin.left + "," + margin.top + ")");
-      
-      // Read the data and compute summary statistics for each specie
-      d3.csv("yearly.csv", function(data) {
-      
-        // Build and Show the Y scale
-        var y = d3.scaleLinear()
-          .domain([ 3.5,8 ])          // Note that here the Y scale is set manually
-          .range([height, 0])
-        svg.append("g").call( d3.axisLeft(y) )
-      
-        // Build and Show the X scale. It is a band scale like for a boxplot: each group has an dedicated RANGE on the axis. This range has a length of x.bandwidth
-        var x = d3.scaleBand()
-          .range([ 0, width ])
-          .domain(["setosa", "versicolor", "virginica"])
-          .padding(0.05)     // This is important: it is the space between 2 groups. 0 means no padding. 1 is the maximum.
-        svg.append("g")
-          .attr("transform", "translate(0," + height + ")")
-          .call(d3.axisBottom(x))
-      
-        // Features of the histogram
-        var histogram = d3.histogram()
-              .domain(y.domain())
-              .thresholds(y.ticks(20))    // Important: how many bins approx are going to be made? It is the 'resolution' of the violin plot
-              .value(d => d)
-      
-        // Compute the binning for each group of the dataset
-        var sumstat = d3.nest()  // nest function allows to group the calculation per level of a factor
-          .key(function(d) { return d.Species;})
-          .rollup(function(d) {   // For each key..
-            input = d.map(function(g) { return g.Sepal_Length;})    // Keep the variable called Sepal_Length
-            bins = histogram(input)   // And compute the binning on it.
-            return(bins)
-          })
-          .entries(data)
-      
-        // What is the biggest number of value in a bin? We need it cause this value will have a width of 100% of the bandwidth.
-        var maxNum = 0
-        for ( i in sumstat ){
-          allBins = sumstat[i].value
-          lengths = allBins.map(function(a){return a.length;})
-          longuest = d3.max(lengths)
-          if (longuest > maxNum) { maxNum = longuest }
-        }
-      
-        // The maximum width of a violin must be x.bandwidth = the width dedicated to a group
-        var xNum = d3.scaleLinear()
-          .range([0, x.bandwidth()])
-          .domain([-maxNum,maxNum])
-      
-        // Color scale for dots
-        var myColor = d3.scaleSequential()
-          .interpolator(d3.interpolateInferno)
-          .domain([3,9])
-      
-        // Add the shape to this svg!
-        svg
-          .selectAll("myViolin")
-          .data(sumstat)
-          .enter()        // So now we are working group per group
-          .append("g")
-            .attr("transform", function(d){ return("translate(" + x(d.key) +" ,0)") } ) // Translation on the right to be at the group position
-          .append("path")
-              .datum(function(d){ return(d.value)})     // So now we are working bin per bin
-              .style("stroke", "none")
-              .style("fill","grey")
-              .attr("d", d3.area()
-                  .x0( xNum(0) )
-                  .x1(function(d){ return(xNum(d.length)) } )
-                  .y(function(d){ return(y(d.x0)) } )
-                  .curve(d3.curveCatmullRom)    // This makes the line smoother to give the violin appearance. Try d3.curveStep to see the difference
-              )
-      
-        // Add individual points with jitter
-        var jitterWidth = 40
-        svg
-          .selectAll("indPoints")
-          .data(data)
-          .enter()
-          .append("circle")
-            .attr("cx", function(d){return(x(d.Species) + x.bandwidth()/2 - Math.random()*jitterWidth )})
-            .attr("cy", function(d){return(y(d.Sepal_Length))})
-            .attr("r", 5)
-            .style("fill", function(d){ return(myColor(d.Sepal_Length))})
-            .attr("stroke", "white")
-      
-      })
-      
-      </script>
-
   </div>
   <script src="./particles.js-master/particles.js"></script>
   <script src="./particles.js-master/demo/js/app.js"></script>
