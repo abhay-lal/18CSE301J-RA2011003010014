@@ -1,5 +1,5 @@
 
-          // set the dimensions and margins of the graph
+// set the dimensions and margins of the graph
           var margin = { top: 10, right: 30, bottom: 30, left: 40 },
             width = 460 - margin.left - margin.right,
             height = 400 - margin.top - margin.bottom;
@@ -41,7 +41,7 @@
             var sumstat = d3.nest()  // nest function allows to group the calculation per level of a factor
               .key(function (d) { return d.State / UT; })
               .rollup(function (d) {   // For each key..
-                input = d.map(function (g) { return g.Sepal_Length; })    // Keep the variable called Sepal_Length
+                input = d.map(function (g) { return g[2016]; })    // Keep the variable called Sepal_Length
                 bins = histogram(input)   // And compute the binning on it.
                 return (bins)
               })
@@ -92,9 +92,9 @@
               .enter()
               .append("circle")
               .attr("cx", function (d) { return (x(d.State / UT) + x.bandwidth() / 2 - Math.random() * jitterWidth) })
-              .attr("cy", function (d) { return (y(d.Sepal_Length)) })
+              .attr("cy", function (d) { return (y(d[2016])) })
               .attr("r", 5)
-              .style("fill", function (d) { return (myColor(d.Sepal_Length)) })
+              .style("fill", function (d) { return (myColor(d[2016])) })
               .attr("stroke", "white")
 
           })

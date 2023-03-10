@@ -13,7 +13,7 @@ var svg = d3.select("body")
           "translate(" + margin.left + "," + margin.top + ")");
 
 // Read the data from the CSV file
-d3.text("../datafile.csv").then(function(text) {
+d3.text("./datafile.csv").then(function(text) {
   var data = d3.csvParse(text, function(d) {
     return {
       x: d.x,
